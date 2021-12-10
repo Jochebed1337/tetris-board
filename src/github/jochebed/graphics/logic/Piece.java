@@ -91,10 +91,9 @@ public class Piece {
   private boolean canMoveHorizontally() {
     for(var block : blocks) {
       // block is not allowed to be out of bounds
-      if(block.blockX != 0 && block.blockX != COLUMNS - 1)
         // check if block will intersect another when velocity is less or higher than zero.
-        if ((velocityX > 0 && tetrisPanel.get(block.blockX + 1, block.blockY) != null)
-                || (velocityX < 0 && tetrisPanel.get(block.blockX - 1, block.blockY) != null)) return false;
+        if ((velocityX > 0 && block.blockX != COLUMNS - 1 && tetrisPanel.get(block.blockX + 1, block.blockY) != null)
+                || (velocityX < 0 && block.blockX != 0 && tetrisPanel.get(block.blockX - 1, block.blockY) != null)) return false;
     }
     return true;
   }
