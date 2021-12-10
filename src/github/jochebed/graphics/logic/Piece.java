@@ -61,7 +61,7 @@ public class Piece {
 
     // piece movement
     for (var block : blocks) {
-      if(canMoveHorizontally()) block.blockX += velocityX;
+      block.blockX += velocityX;
       block.blockY += velocityY;
     }
     velocityX = 0;
@@ -88,16 +88,6 @@ public class Piece {
     }
   }
 
-  private boolean canMoveHorizontally() {
-    for(var block : blocks) {
-      // block is not allowed to be out of bounds
-        // check if block will intersect another when velocity is less or higher than zero.
-        if ((velocityX > 0 && block.blockX != COLUMNS - 1 && tetrisPanel.get(block.blockX + 1, block.blockY) != null)
-                || (velocityX < 0 && block.blockX != 0 && tetrisPanel.get(block.blockX - 1, block.blockY) != null)) return false;
-    }
-    return true;
-  }
-
   private void checkLines() {
     // each tick the board gets checked for full lines
     for (int r = ROWS - 1; r > 0; r--)
@@ -108,7 +98,10 @@ public class Piece {
     // checks if one of the blocks touches the side
     // velocity needs to be != 0, so we can see if the player tries to go outside the table
     for (var block : blocks)
-      if (block.blockX == 0 && velocityX < 0 || block.blockX == COLUMNS - 1 && velocityX > 0) {
+      if (block.blockX == 0 && velocityX < 0
+              || block.blockX == COLUMNS - 1 && velocityX > 0
+              || velocityX > 0 && tetrisPanel.get(block.blockX + 1, block.blockY) != null
+              || velocityX < 0 && tetrisPanel.get(block.blockX - 1, block.blockY) != null) {
         velocityX = 0;
         break;
       }
