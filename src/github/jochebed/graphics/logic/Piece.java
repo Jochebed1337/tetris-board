@@ -48,7 +48,7 @@ public class Piece {
     // assigning every block to the piece
     for (int i = 0; i < 4; i++) {
       int positionX = SHAPES[choice][i][0] + modifier;
-      int positionY = SHAPES[choice][i][1] + modifier;
+      int positionY = SHAPES[choice][i][1];
       blocks[i] = new Block(positionX, positionY);
     }
   }
