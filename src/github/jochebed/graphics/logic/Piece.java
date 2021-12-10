@@ -129,7 +129,7 @@ public class Piece {
   /**
    * Calculates transformed location of each block and checks
    * if one of them is colliding with the side or is already in the grid
-   * we won't rotate
+   * if yes we won't rotate
    */
   private boolean canRotate(Block centerBlock) {
     for (var block : blocks) {

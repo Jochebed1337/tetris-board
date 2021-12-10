@@ -75,7 +75,7 @@ public class TetrisPanel extends JPanel {
           graphics.setColor(block);
           graphics.fillRect(c * CELL_SIZE, r * CELL_SIZE, CELL_SIZE, CELL_SIZE);
         }
-        graphics.setColor(Color.WHITE);
+        graphics.setColor(Color.BLACK);
         graphics.drawRect(c * CELL_SIZE, r * CELL_SIZE, CELL_SIZE, CELL_SIZE);
       }
     }
