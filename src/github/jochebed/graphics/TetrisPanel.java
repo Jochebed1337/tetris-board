@@ -81,10 +81,6 @@ public class TetrisPanel extends JPanel {
     }
   }
 
-  public Color[][] getBlockGrid() {
-    return BLOCK_GRID;
-  }
-
   public void spawnPiece() {
     currentFallingPiece = new Piece(this);
   }

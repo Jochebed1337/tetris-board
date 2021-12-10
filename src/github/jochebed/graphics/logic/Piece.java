@@ -116,8 +116,7 @@ public class Piece {
 
   private boolean touchesBottom() {
     for (var block : blocks)
-      // important to set vertical velocity to zero since last
-      // tick will be completed and will affect the blocks
+      // checks if one block collides with ground or will collide with another
       if (block.blockY == ROWS - 1 || tetrisPanel.get(block.blockX, block.blockY + 1) != null)
         return true;
     return false;
@@ -126,6 +125,7 @@ public class Piece {
   /**
    * Calculates transformed location of each block and checks
    * if one of them is colliding with the side or is already in the grid
+   * we won't rotate
    */
   private boolean canRotate(Block centerBlock) {
     for (var block : blocks) {
