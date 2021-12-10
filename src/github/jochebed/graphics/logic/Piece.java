@@ -61,7 +61,7 @@ public class Piece {
 
     // piece movement
     for (var block : blocks) {
-      block.blockX += velocityX;
+      if(canMoveHorizontally()) block.blockX += velocityX;
       block.blockY += velocityY;
     }
     velocityX = 0;
@@ -86,6 +86,17 @@ public class Piece {
       block.blockX = centerBlock.blockX - pivotY;
       block.blockY = centerBlock.blockY + pivotX;
     }
+  }
+
+  private boolean canMoveHorizontally() {
+    for(var block : blocks) {
+      // block is not allowed to be out of bounds
+      if(block.blockX != 0 && block.blockX != COLUMNS - 1)
+        // check if block will intersect another when velocity is less or higher than zero.
+        if ((velocityX > 0 && tetrisPanel.get(block.blockX + 1, block.blockY) != null)
+                || (velocityX < 0 && tetrisPanel.get(block.blockX - 1, block.blockY) != null)) return false;
+    }
+    return true;
   }
 
   private void checkLines() {
