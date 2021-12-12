@@ -1,6 +1,7 @@
 package github.jochebed.graphics;
 
 import github.jochebed.graphics.logic.Piece;
+import github.jochebed.sound.Sound;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,6 +28,7 @@ public class TetrisPanel extends JPanel {
     });
     this.setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
 
+    Sound.BACKGROUND_MUSIC.play();
     var timer = new Timer(10, e -> {
       if(System.currentTimeMillis() - lastFallTime >= COOL_DOWN_TIME) {
         currentFallingPiece.accelerate();
