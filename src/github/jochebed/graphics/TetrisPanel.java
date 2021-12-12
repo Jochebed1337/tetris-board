@@ -29,7 +29,7 @@ public class TetrisPanel extends JPanel {
     this.setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
 
     // Copyright issue. Can't upload it to GitHub, unfortunately.
-    Sound.BACKGROUND_MUSIC.play();
+    // Sound.BACKGROUND_MUSIC.play();
     var timer = new Timer(10, e -> {
       if(System.currentTimeMillis() - lastFallTime >= COOL_DOWN_TIME) {
         currentFallingPiece.accelerate();
@@ -37,10 +37,6 @@ public class TetrisPanel extends JPanel {
       }
       currentFallingPiece.tick();
       repaint();
-      if(!Sound.BACKGROUND_MUSIC.getClip().isActive()) {
-        System.out.println("restarted");
-        Sound.BACKGROUND_MUSIC.play();
-      }
     });
     timer.setRepeats(true);
     timer.start();
