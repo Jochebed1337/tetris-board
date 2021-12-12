@@ -26,10 +26,10 @@ public final class Sound {
       var audioInputStream = AudioSystem.getAudioInputStream(new File(filePath));
       this.audioFormat = audioInputStream.getFormat();
       this.audioBytes = audioInputStream.readAllBytes();
+      this.createClip();
     } catch (UnsupportedAudioFileException | IOException e) {
       e.printStackTrace();
     }
-    this.createClip();
   }
 
   private void setVolume(float volume) {
@@ -58,4 +58,7 @@ public final class Sound {
     clip.start();
   }
 
+  public Clip getClip() {
+    return clip;
+  }
 }
