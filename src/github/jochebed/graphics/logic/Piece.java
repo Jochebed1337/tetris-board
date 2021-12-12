@@ -45,7 +45,7 @@ public class Piece {
     // random choice
     int choice = ThreadLocalRandom.current().nextInt(SHAPES.length);
     // modifier to set random spawn
-    int modifier = ThreadLocalRandom.current().nextInt(5);
+    int modifier = ThreadLocalRandom.current().nextInt(1, 9);
     // assigning every block to the piece
     for (int i = 0; i < 4; i++) {
       int positionX = SHAPES[choice][i][0] + modifier;
@@ -55,14 +55,15 @@ public class Piece {
   }
 
   public void tick() {
-    checkSides();
-    fillGrid();
-    checkLines();
+    this.fillGrid();
+    this.checkLines();
 
     // piece movement
-    for (var block : blocks) {
-      block.blockX += velocityX;
-      block.blockY += velocityY;
+    if(canMove(velocityX, velocityY)) {
+      for (var block : blocks) {
+        block.blockX += velocityX;
+        block.blockY += velocityY;
+      }
     }
     velocityX = 0;
     velocityY = 0;
@@ -94,36 +95,26 @@ public class Piece {
       seeIfLineIsFullAndThenRemove(r);
   }
 
-  private void checkSides() {
-    // checks if one of the blocks touches the side
-    // velocity needs to be != 0, so we can see if the player tries to go outside the table
-    for (var block : blocks)
-      if (block.blockX == 0 && velocityX < 0
-              || block.blockX == COLUMNS - 1 && velocityX > 0
-              || velocityX > 0 && tetrisPanel.get(block.blockX + 1, block.blockY) != null
-              || velocityX < 0 && tetrisPanel.get(block.blockX - 1, block.blockY) != null) {
-        velocityX = 0;
-        break;
-      }
+  public boolean canMove(int destX, int destY) {
+    for(var block : blocks) {
+      int x = destX + block.blockX;
+      int y = destY + block.blockY;
+
+      if(x < 0 || x >= COLUMNS || y < 0 || y >= ROWS || tetrisPanel.get(x, y) != null)
+        return false;
+    }
+    return true;
   }
 
   private void fillGrid() {
     // checks if one of the blocks touches the ground or another block of a piece.
-    if (touchesBottom()) {
+    if (!canMove(0, velocityY)) {
       // if yes we'll pass each block into the grid by its cell coordinate
       for (var block : blocks)
         tetrisPanel.fill(block.blockX, block.blockY, color);
       // of course after that a new piece will appear
       tetrisPanel.spawnPiece();
     }
-  }
-
-  private boolean touchesBottom() {
-    for (var block : blocks)
-      // checks if one block collides with ground or will collide with another
-      if (block.blockY == ROWS - 1 || tetrisPanel.get(block.blockX, block.blockY + 1) != null)
-        return true;
-    return false;
   }
 
   /**
@@ -137,7 +128,7 @@ public class Piece {
       int pivotY = block.blockY - centerBlock.blockY;
       int nextX = centerBlock.blockX - pivotY;
       int nextY = centerBlock.blockY + pivotX;
-      if ((nextX < 0) || (nextX > COLUMNS - 1) || (tetrisPanel.get(nextX, nextY) != null))
+      if (nextY >= ROWS || nextX < 0 || nextX >= COLUMNS || tetrisPanel.get(nextX, nextY) != null)
         return false;
     }
     return true;

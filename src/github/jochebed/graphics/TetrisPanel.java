@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.security.KeyPair;
 
 import static github.jochebed.ConstantsAndUtils.*;
 
@@ -32,27 +33,10 @@ public class TetrisPanel extends JPanel {
         lastFallTime = System.currentTimeMillis();
       }
       currentFallingPiece.tick();
-      this.checkGameOver();
       repaint();
     });
     timer.setRepeats(true);
     timer.start();
-  }
-
-  private void checkGameOver() {
-    // check for game over
-    for(int c = 0; c < COLUMNS; c++) {
-      if(BLOCK_GRID[c][0] != null) {
-        clearAllLines();
-        break;
-      }
-    }
-  }
-
-  private void clearAllLines() {
-    for(int c = 0; c < COLUMNS; c++)
-      for(int r = 0; r < ROWS; r++)
-        BLOCK_GRID[c][r] = null;
   }
 
   @Override
@@ -83,6 +67,14 @@ public class TetrisPanel extends JPanel {
 
   public void spawnPiece() {
     currentFallingPiece = new Piece(this);
+    if(!currentFallingPiece.canMove(0, 0))
+      clearAllLines();
+  }
+
+  private void clearAllLines() {
+    for(int c = 0; c < COLUMNS; c++)
+      for(int r = 0; r < ROWS; r++)
+        BLOCK_GRID[c][r] = null;
   }
 
   public void fill(int x, int y, Color color) {
