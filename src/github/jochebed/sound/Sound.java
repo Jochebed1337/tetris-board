@@ -3,32 +3,28 @@ package github.jochebed.sound;
 import javax.sound.sampled.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 public final class Sound {
-  public static final Sound BACKGROUND_MUSIC = new Sound("resources/tetris_theme.wav"); // referenced from tetris dot com
+  public static final Sound BACKGROUND_MUSIC = new Sound("resources/tetris_theme.wav", true); // referenced from tetris dot com
   ///// MORE COMING SOON /////
 
-  private final Set<Clip> clips = new HashSet<>();
   private Clip clip;
-  private AudioFormat audioFormat;
-  private byte[] audioBytes;
+  private AudioInputStream audioInputStream;
   private float volume;
+  private boolean loop;
 
-  private Sound(String filePath, float volume) {
-    this(filePath);
+  private Sound(String filePath, float volume, boolean loop) {
+    this(filePath, loop);
     this.setVolume(volume);
   }
 
-  private Sound(String filePath) {
+  private Sound(String filePath, boolean loop) {
     try {
-      var audioInputStream = AudioSystem.getAudioInputStream(new File(filePath));
-      this.audioFormat = audioInputStream.getFormat();
-      this.audioBytes = audioInputStream.readAllBytes();
+      this.audioInputStream = AudioSystem.getAudioInputStream(new File(filePath));
+      this.loop = loop;
       this.createClip();
     } catch (UnsupportedAudioFileException | IOException e) {
-      e.printStackTrace();
+      System.out.println("Couldn't load sound.");
     }
   }
 
@@ -37,28 +33,19 @@ public final class Sound {
     floatControl.setValue(Math.max(floatControl.getMinimum(), Math.min(volume, floatControl.getMaximum())));
   }
 
-  private Clip createClip() {
+  private void createClip() {
     try {
       this.clip = AudioSystem.getClip();
-      clip.open(audioFormat, audioBytes, 0, audioBytes.length);
-      this.clips.add(clip);
-    } catch (LineUnavailableException e) {
+      clip.open(audioInputStream);
+    } catch (LineUnavailableException | IOException e) {
       e.printStackTrace();
     }
-
-    return clip;
   }
 
   public void play() {
-    var clip = this.clips.stream()
-            .filter(c -> c.getFramePosition() == 0 || c.getFramePosition() == c.getFrameLength())
-            .findFirst()
-            .orElseGet(this::createClip);
     clip.setFramePosition(0);
     clip.start();
-  }
-
-  public Clip getClip() {
-    return clip;
+    if(loop)
+      clip.loop(Clip.LOOP_CONTINUOUSLY);
   }
 }
