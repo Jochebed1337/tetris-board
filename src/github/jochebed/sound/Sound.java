@@ -5,11 +5,10 @@ import java.io.File;
 import java.io.IOException;
 
 public final class Sound {
-  public static final Sound BACKGROUND_MUSIC = new Sound("resources/tetris_theme.wav", true); // referenced from tetris dot com
+  public static final Sound BACKGROUND_MUSIC = new Sound("src/main/resources/tetris_theme.wav", true); // referenced from tetris dot com
   ///// MORE COMING SOON /////
 
   private Clip clip;
-  private AudioInputStream audioInputStream;
   private float volume;
   private boolean loop;
 
@@ -20,9 +19,9 @@ public final class Sound {
 
   private Sound(String filePath, boolean loop) {
     try {
-      this.audioInputStream = AudioSystem.getAudioInputStream(new File(filePath));
+      AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(filePath));
       this.loop = loop;
-      this.createClip();
+      this.createClip(audioInputStream);
     } catch (UnsupportedAudioFileException | IOException e) {
       System.out.println("Couldn't load sound.");
     }
@@ -33,7 +32,7 @@ public final class Sound {
     floatControl.setValue(Math.max(floatControl.getMinimum(), Math.min(volume, floatControl.getMaximum())));
   }
 
-  private void createClip() {
+  private void createClip(AudioInputStream audioInputStream) {
     try {
       this.clip = AudioSystem.getClip();
       clip.open(audioInputStream);
@@ -43,9 +42,11 @@ public final class Sound {
   }
 
   public void play() {
-    clip.setFramePosition(0);
-    clip.start();
-    if(loop)
-      clip.loop(Clip.LOOP_CONTINUOUSLY);
+    new Thread(() -> {
+      clip.setFramePosition(0);
+      clip.start();
+      if(loop)
+        clip.loop(Clip.LOOP_CONTINUOUSLY);
+    }).start();
   }
 }
