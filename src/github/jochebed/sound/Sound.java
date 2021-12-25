@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.IOException;
 
 public final class Sound {
-    public static final Sound BACKGROUND_MUSIC = new Sound("src/main/resources/tetris_theme.wav", true); // referenced from tetris dot com
+    public static final Sound BACKGROUND_MUSIC = new Sound("src/main/resources/tetris_theme.wav", true); // referenced from tetris
     ///// MORE COMING SOON /////
 
     private Clip clip;
