@@ -1,12 +1,13 @@
-package github.jochebed.graphics.logic;
+package com.github.jochebed.graphics.logic;
 
-import github.jochebed.graphics.TetrisPanel;
+import com.github.jochebed.state.list.GameState;
+import com.github.jochebed.state.list.MenuState;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static github.jochebed.ConstantsAndUtils.*;
+import static com.github.jochebed.ConstantsAndUtils.*;
 
 public class Piece {
   private static final int[][][] SHAPES = {
@@ -21,20 +22,21 @@ public class Piece {
 
   private int velocityX;
   private int velocityY;
+  private int lines;
 
-  private final TetrisPanel tetrisPanel;
+  private final GameState gameState;
   private final Color color;
   private final Block[] blocks;
 
   /**
    * This only gets called when a new piece needs to be added.
    */
-  public Piece(TetrisPanel tetrisPanel) {
+  public Piece(GameState gameState) {
     // generates a random color and assigns it to this piece
     this.color = generateRandomColor();
     // each piece consists of four blocks
     this.blocks = new Block[4];
-    this.tetrisPanel = tetrisPanel;
+    this.gameState = gameState;
     this.construct();
   }
 
@@ -45,7 +47,7 @@ public class Piece {
     // random choice
     int choice = ThreadLocalRandom.current().nextInt(SHAPES.length);
     // modifier to set random spawn
-    int modifier = ThreadLocalRandom.current().nextInt(1, 9);
+    int modifier = ThreadLocalRandom.current().nextInt(1, COLUMNS - 1);
     // assigning every block to the piece
     for (int i = 0; i < 4; i++) {
       int positionX = SHAPES[choice][i][0] + modifier;
@@ -56,10 +58,10 @@ public class Piece {
 
   public void tick() {
     this.fillGrid();
-    this.checkLines();
+    this.checkBoard();
 
     // piece movement
-    if(canMove(velocityX, velocityY)) {
+    if (canMove(velocityX, velocityY)) {
       for (var block : blocks) {
         block.blockX += velocityX;
         block.blockY += velocityY;
@@ -71,10 +73,18 @@ public class Piece {
 
   public void respondToKey(int key) {
     switch (key) {
-      case KeyEvent.VK_UP -> this.rotate();
       case KeyEvent.VK_LEFT -> velocityX = -1;
       case KeyEvent.VK_RIGHT -> velocityX = 1;
       case KeyEvent.VK_DOWN -> velocityY = 1;
+      case KeyEvent.VK_UP -> this.rotate();
+      case KeyEvent.VK_SPACE -> this.moveDownInstant();
+      case KeyEvent.VK_ESCAPE -> gameState.setNextState(new MenuState(gameState.getInput()));
+    }
+  }
+
+  private void moveDownInstant() {
+    while(this.canMove(0, 1)) {
+      for(var block : blocks) block.blockY++;
     }
   }
 
@@ -89,31 +99,39 @@ public class Piece {
     }
   }
 
-  private void checkLines() {
+  private void checkBoard() {
     // each tick the board gets checked for full lines
-    for (int r = ROWS - 1; r > 0; r--)
-      seeIfLineIsFullAndThenRemove(r);
+    for (int row = ROWS - 1; row > 0; row--)
+      checkRow(row);
+    switch (lines) {
+      case 1 -> gameState.addScore(40);
+      case 2 -> gameState.addScore(100);
+      case 3 -> gameState.addScore(300);
+      case 4 -> gameState.addScore(1200);
+    }
+    lines = 0;
   }
 
   public boolean canMove(int destX, int destY) {
-    for(var block : blocks) {
+    for (var block : blocks) {
       int x = destX + block.blockX;
       int y = destY + block.blockY;
 
-      if(x < 0 || x >= COLUMNS || y < 0 || y >= ROWS || tetrisPanel.get(x, y) != null)
+      if (x < 0 || x >= COLUMNS || y < 0 || y >= ROWS || gameState.get(x, y) != null)
         return false;
     }
     return true;
   }
+
 
   private void fillGrid() {
     // checks if one of the blocks touches the ground or another block of a piece.
     if (!canMove(0, velocityY)) {
       // if yes we'll pass each block into the grid by its cell coordinate
       for (var block : blocks)
-        tetrisPanel.fill(block.blockX, block.blockY, color);
+        gameState.fill(block.blockX, block.blockY, color);
       // of course after that a new piece will appear
-      tetrisPanel.spawnPiece();
+      gameState.spawnPiece();
     }
   }
 
@@ -128,30 +146,29 @@ public class Piece {
       int pivotY = block.blockY - centerBlock.blockY;
       int nextX = centerBlock.blockX - pivotY;
       int nextY = centerBlock.blockY + pivotX;
-      if (nextY >= ROWS || nextX < 0 || nextX >= COLUMNS || tetrisPanel.get(nextX, nextY) != null)
+      if (nextY >= ROWS || nextX < 0 || nextX >= COLUMNS || gameState.get(nextX, nextY) != null)
         return false;
     }
     return true;
   }
 
-  private void seeIfLineIsFullAndThenRemove(int line) {
+  private void checkRow(int line) {
     // check if line is full
     for (int c = 0; c < COLUMNS; c++) {
-      var block = tetrisPanel.get(c, line);
-      if (block == null)
-        return;
+      var block = gameState.get(c, line);
+      if (block == null) return;
     }
+    // if yes then the line count will be increased.
+    // it will be used later to determine the score @checkBoard()V
+    lines++;
 
     // clear line if line is full
     for (int i = 0; i < COLUMNS; i++)
-      tetrisPanel.fill(i, line, null);
+      gameState.fill(i, line, null);
     // reposition lines after one being cleared
     repositionBlocks(line);
   }
 
-  /**
-   * Looks stupid
-   */
   public void accelerate() {
     velocityY = 1;
   }
@@ -159,7 +176,7 @@ public class Piece {
   private void repositionBlocks(int line) {
     for (int c = 0; c < COLUMNS; c++)
       for (int r = line; r > 0; r--)
-        tetrisPanel.fill(c, r, tetrisPanel.get(c, r - 1));
+        gameState.fill(c, r, gameState.get(c, r - 1));
   }
 
   public void render(Graphics graphics) {
