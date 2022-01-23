@@ -11,8 +11,8 @@ public class Window extends JFrame {
     this.setTitle(windowTitle);
 
     var input = new Input(new KeyboardInput(), new MouseInput());
+    var panel = new Display(input);
 
-    JPanel panel = new Display(input);
     panel.addMouseListener(input.mouseInput());
     panel.addMouseMotionListener(input.mouseInput());
 

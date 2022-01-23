@@ -24,17 +24,29 @@ public class ComponentContainer extends Component {
 
   public ComponentContainer(Image backgroundImage, int componentWidth, int componentHeight, Alignment alignment) {
     this.setBackgroundImage(backgroundImage);
-    this.constructContainer(componentWidth, componentHeight, alignment);
+    this.constructContainer(0, 0, componentWidth, componentHeight, alignment);
   }
 
-  public ComponentContainer(Color color,  int componentWidth, int componentHeight, Alignment alignment) {
+  public ComponentContainer(Image backgroundImage, int componentX, int componentY, int componentWidth, int componentHeight, Alignment alignment) {
+    this.setBackgroundImage(backgroundImage);
+    this.constructContainer(componentX, componentY, componentWidth, componentHeight, alignment);
+  }
+
+  public ComponentContainer(Color color, int componentWidth, int componentHeight, Alignment alignment) {
     this.setColor(color);
-    this.constructContainer(componentWidth, componentHeight, alignment);
+    this.constructContainer(0, 0, componentWidth, componentHeight, alignment);
   }
 
-  private void constructContainer(int componentWidth, int componentHeight, Alignment alignment) {
-    this.setComponentWidth(Math.round(componentWidth));
-    this.setComponentHeight(Math.round(componentHeight));
+  public ComponentContainer(Color color, int componentX, int componentY, int componentWidth, int componentHeight, Alignment alignment) {
+    this.setColor(color);
+    this.constructContainer(componentX, componentY, componentWidth, componentHeight, alignment);
+  }
+
+  private void constructContainer(int componentX, int componentY, int componentWidth, int componentHeight, Alignment alignment) {
+    this.setComponentX(componentX);
+    this.setComponentY(componentY);
+    this.setComponentWidth(componentWidth);
+    this.setComponentHeight(componentHeight);
     this.setAlignment(alignment);
   }
 
@@ -51,24 +63,27 @@ public class ComponentContainer extends Component {
   public void render(Graphics graphics) {
     if(backgroundImage == null) {
       graphics.setColor(color);
-      graphics.fillRect(0, 0, getComponentWidth(), getComponentHeight());
-    } else graphics.drawImage(backgroundImage, 0, 0, getComponentWidth(), getComponentHeight(), null);
+      graphics.fillRect(getComponentX(), getComponentY(), getComponentWidth(), getComponentHeight());
+    } else graphics.drawImage(backgroundImage, getComponentX(), getComponentY(), getComponentWidth(), getComponentHeight(), null);
     this.components.forEach(component -> component.render(graphics));
   }
 
-  public void realign(Alignment alignment) {
-    var atomicInt = new AtomicInteger(0);
+  private void realign(Alignment alignment) {
+    var atomicInt = new AtomicInteger(alignment == Alignment.HORIZONTAL ? this.getComponentX() : this.getComponentY());
     switch (alignment) {
       case HORIZONTAL -> components.forEach(component -> {
+        component.setComponentY(component.getComponentY());
         component.setComponentX(atomicInt.get());
-        component.setComponentWidth(getComponentWidth() / components.size());
+        component.setComponentWidth(this.getComponentWidth() / components.size());
+        component.setComponentHeight(this.getComponentHeight());
         atomicInt.addAndGet(component.getComponentWidth());
       });
 
       case VERTICAL -> components.forEach(component -> {
+        component.setComponentX(this.getComponentX());
         component.setComponentY(atomicInt.get());
-        component.setComponentWidth(getComponentWidth());
-        component.setComponentHeight(getComponentHeight() / components.size());
+        component.setComponentWidth(this.getComponentWidth());
+        component.setComponentHeight(this.getComponentHeight() / components.size());
         atomicInt.addAndGet(component.getComponentHeight());
       });
     }

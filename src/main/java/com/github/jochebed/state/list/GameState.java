@@ -39,11 +39,20 @@ public class GameState extends State {
     renderBackground(graphics);
     currentPiece.render(graphics);
     renderMatrix(graphics);
+    renderScore(graphics);
   }
 
   private void renderBackground(Graphics graphics) {
     graphics.setColor(Color.DARK_GRAY);
     graphics.fillRect(0, 0, BOARD_WIDTH, BOARD_HEIGHT);
+  }
+
+  private void renderScore(Graphics graphics) {
+    var score = "Score: " + this.score;
+    int strWidth = CANVAS.getFontMetrics(FONT).stringWidth(score) + 10;
+    graphics.setFont(FONT);
+    graphics.setColor(Color.YELLOW);
+    graphics.drawString(score, BOARD_WIDTH - strWidth, 20);
   }
 
   private void renderMatrix(Graphics graphics) {
@@ -54,11 +63,11 @@ public class GameState extends State {
         // draw block
         if(block != null) {
           graphics.setColor(block);
-          graphics.fillRect(c * CELL_SIZE, r * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+          graphics.fillRoundRect(c * CELL_SIZE, r * CELL_SIZE, CELL_SIZE, CELL_SIZE, ARC_SIZE, ARC_SIZE);
         }
         // draw grid
         graphics.setColor(Color.BLACK);
-        graphics.drawRect(c * CELL_SIZE, r * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+        graphics.drawRoundRect(c * CELL_SIZE, r * CELL_SIZE, CELL_SIZE, CELL_SIZE, ARC_SIZE, ARC_SIZE);
       }
     }
   }
@@ -81,7 +90,8 @@ public class GameState extends State {
     currentPiece = new Piece(this);
     if(!currentPiece.canMove(0, 0)) {
       clearTable();
-      this.setNextState(new GameOverState(this.getInput()));
+      var gameOverState = new GameOverState(this.getInput());
+      this.setNextState(gameOverState);
     }
   }
 

@@ -17,6 +17,7 @@ public final class ButtonComponent extends Component implements MouseInputSubscr
   public ButtonComponent(String text, MouseInputAction action) {
     this.textComponent = new TextComponent(text, Color.BLACK);
     this.textComponent.setParent(this);
+
     this.action = action;
   }
 
@@ -45,10 +46,10 @@ public final class ButtonComponent extends Component implements MouseInputSubscr
   @Override
   public boolean onFocus(State state) {
     if(this.intersects(state.getInput().mouseInput().getMousePosition())) {
-      buttonColor = Color.GRAY;
+      buttonColor = Color.WHITE;
       return true;
     }
-    buttonColor = Color.RED;
+    buttonColor = Color.LIGHT_GRAY;
     return false;
   }
 }

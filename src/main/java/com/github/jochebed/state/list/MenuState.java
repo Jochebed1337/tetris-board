@@ -1,6 +1,7 @@
 package com.github.jochebed.state.list;
 
 import com.github.jochebed.input.Input;
+import com.github.jochebed.sound.Sound;
 import com.github.jochebed.state.State;
 import com.github.jochebed.ui.component.focusable.ButtonComponent;
 import com.github.jochebed.ui.container.ComponentContainer;
@@ -17,10 +18,11 @@ public class MenuState extends State {
     super(input);
     var highScoreContainer = new ComponentContainer(Color.DARK_GRAY, BOARD_WIDTH, BOARD_HEIGHT, ComponentContainer.Alignment.VERTICAL);
 
-    container = new ComponentContainer(Color.DARK_GRAY, BOARD_WIDTH, BOARD_HEIGHT, ComponentContainer.Alignment.VERTICAL);
+    container = new ComponentContainer(Color.DARK_GRAY, 20, 20, BOARD_WIDTH - 40, BOARD_HEIGHT - 40, ComponentContainer.Alignment.VERTICAL);
     container.addComponent(new ButtonComponent("Play", state -> state.setNextState(new GameState(input))));
     container.addComponent(new ButtonComponent("High score", state -> container = highScoreContainer));
     container.addComponent(new ButtonComponent("Quit", state -> System.exit(1)));
+    Sound.BACKGROUND_MUSIC.play();
   }
 
   @Override

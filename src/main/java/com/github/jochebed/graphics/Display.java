@@ -1,7 +1,6 @@
 package com.github.jochebed.graphics;
 
 import com.github.jochebed.input.Input;
-import com.github.jochebed.sound.Sound;
 import com.github.jochebed.state.State;
 import com.github.jochebed.state.list.MenuState;
 import lombok.Getter;
@@ -23,27 +22,21 @@ public final class Display extends JPanel {
     this.setState(new MenuState(input));
     this.setPreferredSize(new Dimension(BOARD_WIDTH, BOARD_HEIGHT));
     input.keyboardInput().setDisplay(this);
-    playMusic();
-    createTimer();
+    this.createTimer();
   }
 
   private void createTimer() {
     var timer = new Timer(0, e -> {
-      state.tick();
-      switchState();
-      repaint();
+      this.getState().tick();
+      this.switchState();
+      this.repaint();
     });
-
     timer.setRepeats(true);
     timer.start();
   }
 
-  private void playMusic() {
-    Sound.BACKGROUND_MUSIC.play();
-  }
-
   private void switchState() {
-    if(state.getNextState() != null)
+    if (state.getNextState() != null)
       this.setState(state.getNextState());
   }
 

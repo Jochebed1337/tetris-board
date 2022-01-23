@@ -10,7 +10,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import static com.github.jochebed.ConstantsAndUtils.*;
 
 public class Piece {
-  private static final int[][][] SHAPES = {
+  private static final int[][][] TETROMINO_SHAPES = {
           {{0, 0}, {0, 1}, {1, 1}, {1, 2}},
           {{1, 0}, {1, 1}, {0, 1}, {0, 2}},
           {{0, 0}, {0, 1}, {0, 2}, {1, 2}},
@@ -33,7 +33,7 @@ public class Piece {
    */
   public Piece(GameState gameState) {
     // generates a random color and assigns it to this piece
-    this.color = generateRandomColor();
+    this.color = generateCertainColor();
     // each piece consists of four blocks
     this.blocks = new Block[4];
     this.gameState = gameState;
@@ -45,13 +45,13 @@ public class Piece {
    */
   private void construct() {
     // random choice
-    int choice = ThreadLocalRandom.current().nextInt(SHAPES.length);
+    int choice = ThreadLocalRandom.current().nextInt(TETROMINO_SHAPES.length);
     // modifier to set random spawn
     int modifier = ThreadLocalRandom.current().nextInt(1, COLUMNS - 1);
     // assigning every block to the piece
     for (int i = 0; i < 4; i++) {
-      int positionX = SHAPES[choice][i][0] + modifier;
-      int positionY = SHAPES[choice][i][1];
+      int positionX = TETROMINO_SHAPES[choice][i][0] + modifier;
+      int positionY = TETROMINO_SHAPES[choice][i][1];
       blocks[i] = new Block(positionX, positionY);
     }
   }
@@ -83,9 +83,8 @@ public class Piece {
   }
 
   private void moveDownInstant() {
-    while(this.canMove(0, 1)) {
-      for(var block : blocks) block.blockY++;
-    }
+    while (this.canMove(0, 1))
+      for (var block : blocks) block.blockY++;
   }
 
   private void rotate() {
@@ -146,7 +145,7 @@ public class Piece {
       int pivotY = block.blockY - centerBlock.blockY;
       int nextX = centerBlock.blockX - pivotY;
       int nextY = centerBlock.blockY + pivotX;
-      if (nextY >= ROWS || nextX < 0 || nextX >= COLUMNS || gameState.get(nextX, nextY) != null)
+      if (nextY <= 0 || nextY >= ROWS || nextX < 0 || nextX >= COLUMNS || gameState.get(nextX, nextY) != null)
         return false;
     }
     return true;
@@ -182,7 +181,7 @@ public class Piece {
   public void render(Graphics graphics) {
     graphics.setColor(color);
     for (var block : blocks)
-      graphics.fillRect(block.blockX * CELL_SIZE, block.blockY * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+      graphics.fillRoundRect(block.blockX * CELL_SIZE, block.blockY * CELL_SIZE, CELL_SIZE, CELL_SIZE, ARC_SIZE, ARC_SIZE);
   }
 
   private static final class Block {

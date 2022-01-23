@@ -3,7 +3,7 @@ package com.github.jochebed.state.list;
 import com.github.jochebed.input.Input;
 import com.github.jochebed.sound.Sound;
 import com.github.jochebed.state.State;
-import com.github.jochebed.ui.component.TextComponent;
+import com.github.jochebed.ui.component.focusable.ButtonComponent;
 import com.github.jochebed.ui.container.ComponentContainer;
 
 import java.awt.*;
@@ -16,16 +16,20 @@ public class GameOverState extends State {
 
   public GameOverState(Input input) {
     super(input);
-    this.container = new ComponentContainer(Color.BLACK, BOARD_WIDTH, BOARD_HEIGHT, ComponentContainer.Alignment.VERTICAL);
+    this.container = new ComponentContainer(Color.BLACK, 0, 0, BOARD_WIDTH, BOARD_HEIGHT, ComponentContainer.Alignment.VERTICAL);
+    this.onGameOver();
+  }
 
-    var gameOverText = new TextComponent("GAME OVER!", Color.WHITE);
-    this.container.addComponent(gameOverText);
+  private void onGameOver() {
+    var button = new ButtonComponent("Game Over! Play again?", state -> this.setNextState(new MenuState(input)));
+    this.container.addComponent(button);
     Sound.BACKGROUND_MUSIC.stop();
   }
 
   @Override
   public void tick() {
     container.tick(this);
+    input.mouseInput().tick(this);
   }
 
   @Override
